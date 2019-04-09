@@ -1,0 +1,197 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{%  if showlogin==False %}
+<script>
+var parent = document.getElementById("spanlogin");
+var child = document.getElementById("loginId");
+parent.removeChild(child);
+$(document).ready(function(){    
+ $("#logoutId").show();
+       return false; 
+
+});
+
+$(document).ready(function(){ 
+$('.lightSlider').lightSlider({
+    gallery: true,
+    item: 1,
+    loop: true,
+    slideMargin: 0,
+    thumbItem: 5
+});
+});
+
+</script>
+{% endif %}
+
+	<main class="hero-section">
+		<div class="container">
+			<div class="section-tabs">
+			</div>
+		   <div class="login_user_message">
+		   	Hi, {{ user }}<br />
+		   	<span class="login_email_message">Logged in as ({{ useremail }})</span>
+		   </div>
+			<div class="section-map">
+				<div class="nav">
+					<form method="POST" action="/home">
+					{{ form.hidden_tag() }}
+					<div class="form-group">
+						{% if  form.city.errors %}
+            				{% for error in form.city.errors %}
+            					<p class="error-message">{{ error }}</p>
+            				{% endfor %}
+           	 			{% endif %}
+           	 			{{ form.city.label }}
+						{{ form.city }}
+					</div>
+					{{ form.submit(class="btn-primary") }}
+					</form>
+				</div>
+			</div>
+			<div class="clearfix"></div>
+			<div id="recommend_message">
+				{% if hotels|length>0 %}
+				<div>
+					Approach used: Popularity Based
+				</div>
+				Recommended hotels for you in your city:
+				{% elif recommendations|length>0 %}
+				Recommended hotels based on your interest:				
+				{% endif %}
+			</div>
+			<div class="hotel-list">
+				{% for hotel in hotels %}
+					<div class="hotel-box">
+						<div class="hotel_image_slider_div">
+							<ul class="lightSlider">
+								{% for url in hotel['image_urls'].split('|')[:5] %}
+        							<li data-thumb="{{ url }}">
+            						<img src="{{ url }}" />
+            					</li>
+            					{% endfor %}
+            				</ul>
+						</div>
+						<div class="hotel_info_div">
+							<div class="hotel-name-box">
+								{% if hotel['property_name']|length>35 %}
+								<div class="hotel_name">{{ hotel['property_name'][:35]+"..." }}</div>
+								{% else %}
+								<div class="hotel_name">
+								<a href = "{{ url_for('hotel', hotelId=hotel['property_id'], city=hotel['city'])}}">{{ hotel['property_name'] }}</a>
+								</div>
+								{% endif %}
+								<div class="hotel_location">City: {{ hotel['city'] }}</div>
+								<div class="hotel_location">Area: {{ hotel['area'] }}</div>
+								{% if hotel['address']|length>35 %}
+								<div class="hotel_location">Address: {{ hotel['address'][:35]+"..." }}
+								</div>
+								{% else %}
+								<div class="hotel_location">Address: {{ hotel['address'] }}
+								</div>
+								{% endif %}
+								<!-- {{ hotel }} -->
+							</div>
+							<div class="clearfix"></div>
+							<div class="hotel-rating-box">
+								{% if hotel['tad_review_rating']<5 and hotel['tad_review_rating']>4 %}
+									<span><img src="/static/img/4.5_star.png" width="80"></span>
+								{% elif hotel['tad_review_rating']<4 and hotel['tad_review_rating']>3 %}
+									<span><img src="/static/img/3.5_star.png" width="80"></span>
+								{% elif hotel['tad_review_rating']<3 and hotel['tad_review_rating']>2 %}
+									<span><img src="/static/img/2.5_star.png" width="80"></span>
+								{% elif hotel['tad_review_rating']<2 and hotel['tad_review_rating']>1 %}
+									<span><img src="/static/img/1.5_star.png" width="80"></span>
+								{% endif %}
+								<span>{{ (hotel['tad_review_rating']|string)[:3] }}</span>
+								<span class="comment_icon"><img src="/static/img/comment.png" width="16"></span>
+								{% if hotel['tad_review_count']|length<=0 %}
+									<span> No reviews</span>
+								{% else %}
+								<span>{{ hotel['tad_review_count'] }} 
+								reviews</span>
+								{% endif %}
+							</div>
+							<div class="hotel-rating-box"> 
+								<span class="rating_text"> {{ hotel['rating_count'] }}</span> total ratings
+							</div>
+						</div>
+						<div class="hotel_meta_info_div">
+							<div>
+								Room type: {{ hotel['room_type'] }}
+							</div>
+						</div>
+	
+
+					</div>					
+				{% endfor %}
+				<div class="clearfix"></div>
+				<div id="fetchedData">
+                 </div>
+                 <!-- <span id="ajaxpage">2</span> -->
+                 <input type="hidden" name="ajaxpage" id="ajaxpage", value="1"></input>
+                 <span id="nomore"></span>
+                 {% if hotels|length>0 %}
+                 <span id="ajaxloader"><img src="{{ url_for('static', filename='img/ajax-loader.gif') }}" width="32" height="32" /></span>
+                 <input type="button" id="fetchHotels" value="show more" class="btn-primary" style="margin-left: 350px;" />
+                 {% endif %}
+			<div class="recmdKNN">
+					{% if hotels|length<=0 and recommendations|length<=0 %}
+						<h4>Since we don't know anything about your interests yet therefore please select city to get recommendations:</h4>
+					{% elif recommendations|length>0 %}
+						<h4>Recommendations using KNN (over 16 attributes):</h4>
+					{% endif %}
+					
+					<ul>
+					{% for rec in recommendations %}
+						{% for r in rec %}
+					
+						<li>
+							<div class="hotel_thumb">
+								<img width="180" height="150" src="{{ r['image_urls'].split('|')[0] }}" />
+							</div>
+							<a href="{{ url_for('hotel', hotelId=r['property_id'], city=r['city'])}}">
+							<div class="hotel_name" style="padding: 5px 5px;">
+								{% if r['property_name']|length>18 %}
+									{{ (r['property_name']|string)[:19] }}
+								{% else %}
+									{{ r['property_name'] }}
+								{% endif %}
+							</div>
+							</a>
+							<div class="hotel_location" style="padding: 5px 5px;">
+							City: {{ r['city'] }}
+							</div>
+							<div class="hotel-rating-box">
+								{% if r['tad_review_rating']<5 and r['tad_review_rating']>4 %}
+									<span><img src="/static/img/4.5_star.png" width="80"></span>
+								{% elif r['tad_review_rating']<4 and r['tad_review_rating']>3 %}
+									<span><img src="/static/img/3.5_star.png" width="80"></span>
+								{% elif r['tad_review_rating']<3 and r['tad_review_rating']>2 %}
+									<span><img src="/static/img/2_star.png" width="80"></span>
+								{% elif r['tad_review_rating']<2 and r['tad_review_rating']>1 %}
+									<span><img src="/static/img/1_star.png" width="80"></span>
+								{% endif %}
+								<span>{{ (r['tad_review_rating']|string)[:3] }}</span>
+								<div style="margin-left:-20px;margin-top: 5px;">
+									<span class="comment_icon"><img src="/static/img/comment.png" width="16"></span>
+								{% if r['tad_review_count']|length<=0 %}
+									<span> No reviews</span>
+								{% else %}
+								<span>{{ r['tad_review_count'] }} 
+								reviews</span>
+								{% endif %}
+									
+								</div>
+							</div>
+						</li>
+					    {% endfor %}	
+					{% endfor %}
+			<div class="clearfix"></div>
+			</ul>
+			</div>
+			</div>
+		</div>
+	</main>
+{% endblock %}

@@ -1,0 +1,1 @@
+ps -p $@ -o etimes | tee -a wasteids.txt

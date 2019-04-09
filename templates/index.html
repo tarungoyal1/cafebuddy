@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+	<main class="hero-section">
+			<div class="container">
+				<div class="section-content">
+					<h2>Discover best hotels nearby you.</h2>
+					<a href="{{ url_for('signup') }}" class="btn-primary">Sign Up</a>
+					<a href="{{ url_for('about') }}" class="btn-secondary">Learn more</a>
+					<br />
+
+					<h5>Project created by:</h5>
+					<h5>Tarun Goyal (2018MCA3033)</h5>
+					<h5>Shikha Sharma (2018MCA3026)</h5>
+				</div>
+				<div class="section-device">
+					<img src="static/img/step0001.jpg">
+				</div>
+				<div class="clearfix"></div>
+			</div>
+		</main>
+
+{% endblock %}

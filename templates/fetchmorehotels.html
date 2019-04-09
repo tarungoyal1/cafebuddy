@@ -1,0 +1,72 @@
+<!-- <link type="text/css" rel="stylesheet" href="static/lightslider-master/dist/css/lightslider.css" />
+<script src="static/lightslider-master/dist/js/lightslider.js"></script>  -->
+
+{% if hotels|length <=0 %}
+
+{% else %}
+
+{% for hotel in hotels %}
+					<div class="hotel-box">
+						<div class="hotel_image_slider_div">
+							<ul class="lightSlider">
+								{% for url in hotel['image_urls'].split('|')[:5] %}
+        							<li data-thumb="{{ url }}">
+            						<img src="{{ url }}" />
+            					</li>
+            					{% endfor %}
+            				</ul>
+						</div>
+						<div class="hotel_info_div">
+							<div class="hotel-name-box">
+								{% if hotel['property_name']|length>35 %}
+								<div class="hotel_name">{{ hotel['property_name'][:35]+"..." }}</div>
+								{% else %}
+								<div class="hotel_name">
+								<a href = "{{ url_for('hotel', hotelId=hotel['property_id'], city=hotel['city'])}}">{{ hotel['property_name'] }}</a>
+								</div>
+								{% endif %}
+								<div class="hotel_location">City: {{ hotel['city'] }}</div>
+								<div class="hotel_location">Area: {{ hotel['area'] }}</div>
+								{% if hotel['address']|length>35 %}
+								<div class="hotel_location">Address: {{ hotel['address'][:35]+"..." }}
+								</div>
+								{% else %}
+								<div class="hotel_location">Address: {{ hotel['address'] }}
+								</div>
+								{% endif %}
+								<!-- {{ hotel }} -->
+							</div>
+							<div class="clearfix"></div>
+							<div class="hotel-rating-box">
+								{% if hotel['tad_review_rating']<5 and hotel['tad_review_rating']>4 %}
+									<span><img src="/static/img/4.5_star.png" width="80"></span>
+								{% elif hotel['tad_review_rating']<4 and hotel['tad_review_rating']>3 %}
+									<span><img src="/static/img/3.5_star.png" width="80"></span>
+								{% elif hotel['tad_review_rating']<3 and hotel['tad_review_rating']>2 %}
+									<span><img src="/static/img/2.5_star.png" width="80"></span>
+								{% elif hotel['tad_review_rating']<2 and hotel['tad_review_rating']>1 %}
+									<span><img src="/static/img/1.5_star.png" width="80"></span>
+								{% endif %}
+								<span>{{ (hotel['tad_review_rating']|string)[:3] }}</span>
+								<span class="comment_icon"><img src="/static/img/comment.png" width="16"></span>
+								{% if hotel['tad_review_count']|length<=0 %}
+									<span> No reviews</span>
+								{% else %}
+								<span>{{ hotel['tad_review_count'] }} 
+								reviews</span>
+								{% endif %}
+							</div>
+							<div class="hotel-rating-box"> 
+								<span class="rating_text"> {{ hotel['rating_count'] }}</span> total ratings
+							</div>
+						</div>
+						<div class="hotel_meta_info_div">
+							<div>
+								Room type: {{ hotel['room_type'] }}
+							</div>
+						</div>
+	
+
+					</div>					
+				{% endfor %}
+{% endif %}

@@ -1,0 +1,149 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{%  if showlogin==False %}
+<script>
+var parent = document.getElementById("spanlogin");
+var child = document.getElementById("loginId");
+parent.removeChild(child);
+$(document).ready(function(){    
+ $("#logoutId").show();
+       return false; 
+
+});
+
+$(document).ready(function(){ 
+$('.lightSlider').lightSlider({
+    gallery: true,
+    item: 1,
+    loop: true,
+    slideMargin: 0,
+    thumbItem: 8
+});
+});
+
+</script>
+{% endif %}
+
+		<main class="hero-section">
+			<div class="content_wrapper">
+				<div class="section-map">
+				
+				</div>
+				<div class="clearfix"></div>
+				<div class="about_hotel">
+					<div class="hotel-box">
+						<div class="hotel_image_slider_div">
+							<ul class="lightSlider">
+								{% for url in hotel['image_urls'].split('|')[:5] %}
+        							<li data-thumb="{{ url }}">
+            						<img src="{{ url }}" />
+            					</li>
+            					{% endfor %}
+            				</ul>
+						</div>
+						<div class="hotel_info_div">
+							<div class="hotel-name-box">
+								<div class="hotel_name">
+								{{ hotel['property_name'] }}
+								</div>
+								<div class="hotel_location">City: {{ hotel['city'] }}</div>
+								<div class="hotel_location">Area: {{ hotel['area'] }}</div>
+								<div class="hotel_location">Address: {{ hotel['address'] }}
+								</div>
+							</div>
+							<div class="clearfix"></div>
+							<div class="hotel-rating-box">
+								{% if hotel['tad_review_rating']<5 and hotel['tad_review_rating']>4 %}
+									<span><img src="/static/img/4.5_star.png" width="80"></span>
+								{% elif hotel['tad_review_rating']<4 and hotel['tad_review_rating']>3 %}
+									<span><img src="/static/img/3.5_star.png" width="80"></span>
+								{% elif hotel['tad_review_rating']<3 and hotel['tad_review_rating']>2 %}
+									<span><img src="/static/img/2.5_star.png" width="80"></span>
+								{% elif hotel['tad_review_rating']<2 and hotel['tad_review_rating']>1 %}
+									<span><img src="/static/img/1.5_star.png" width="80"></span>
+								{% endif %}
+								<span>{{ (hotel['tad_review_rating']|string)[:3] }}</span>
+								<span class="comment_icon"><img src="/static/img/comment.png" width="16"></span>
+								{% if hotel['tad_review_count']|length<=0 %}
+									<span> No reviews</span>
+								{% else %}
+								<span>{{ hotel['tad_review_count'] }} 
+								reviews</span>
+								{% endif %}
+							</div>
+							<div class="hotel-rating-box"> 
+								<span class="rating_text"> {{ hotel['rating_count'] }}</span> total ratings
+							</div>
+
+						</div>
+						<div style="margin-top:10px; ">
+							Amenities available:
+							<ul class="room__amenities">
+								{% for fac in hotelfac %}
+									<li><span><img src="static/img/green_tick.png" width="12" height="12" /></span> &nbsp {{ fac }}</li>
+								{% endfor %}
+							</ul>	
+						</div>
+					</div>
+					<div class="hotel_desc">
+						<h4>Hotel Description</h4>
+						<p>
+						{{ (hotelDesc[0]['hotel_description']|string)[1:-1] }}
+						</p>
+					</div>
+					<div class="clearfix"></div>
+					<div class="recmdKNN">
+					<h4>{{ recommendationsKNN|length }} &nbsp recommendations using KNN (over 16 attributes):</h4>
+					<ul>
+					{% for rec in recommendationsKNN%}
+					
+						<li>
+							<div class="hotel_thumb">
+								<img width="180" height="150" src="{{ rec['image_urls'].split('|')[0] }}" />
+							</div>
+							<a href="{{ url_for('hotel', hotelId=rec['property_id'], city=rec['city'])}}">
+							<div class="hotel_name" style="padding: 5px 5px;">
+								{% if rec['property_name']|length>18 %}
+									{{ (rec['property_name']|string)[:19] }}
+								{% else %}
+									{{ rec['property_name'] }}
+								{% endif %}
+							</div>
+							</a>
+							<div class="hotel_location" style="padding: 5px 5px;">
+							City: {{ rec['city'] }}
+							</div>
+							<div class="hotel-rating-box">
+								{% if rec['tad_review_rating']<5 and rec['tad_review_rating']>4 %}
+									<span><img src="/static/img/4.5_star.png" width="80"></span>
+								{% elif rec['tad_review_rating']<4 and rec['tad_review_rating']>3 %}
+									<span><img src="/static/img/3.5_star.png" width="80"></span>
+								{% elif rec['tad_review_rating']<3 and rec['tad_review_rating']>2 %}
+									<span><img src="/static/img/2_star.png" width="80"></span>
+								{% elif rec['tad_review_rating']<2 and rec['tad_review_rating']>1 %}
+									<span><img src="/static/img/1_star.png" width="80"></span>
+								{% endif %}
+								<span>{{ (rec['tad_review_rating']|string)[:3] }}</span>
+								<div style="margin-left:-20px;margin-top: 5px;">
+									<span class="comment_icon"><img src="/static/img/comment.png" width="16"></span>
+								{% if rec['tad_review_count']|length<=0 %}
+									<span> No reviews</span>
+								{% else %}
+								<span>{{ rec['tad_review_count'] }} 
+								reviews</span>
+								{% endif %}
+									
+								</div>
+							</div>
+						</li>	
+					{% endfor %}
+					<div class="clearfix"></div>
+					</ul>
+					</div>
+					<div class="clearfix"></div>
+				</div>
+			</div>
+		</main>
+
+{% endblock %}

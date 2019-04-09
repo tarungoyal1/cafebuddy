@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			Homepage
+		</title>
+		  <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Tangerine">
+          <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Fredoka+One">
+          <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600">
+           <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css')}}">
+           <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+           <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+           <link type="text/css" rel="stylesheet" href="static/lightslider-master/dist/css/lightslider.css" />                  
+			<script src="static/lightslider-master/dist/js/lightslider.js"></script> 
+          </head>
+	<body>
+		<header>
+			<div class="container">
+				<h1 class="title"><a href="/">Cafebuddy
+				</a></h1>
+				<span id="spanlogin">
+					<a href="{{ url_for('login') }}" id="loginId" class="btn-login">Login</a>
+				</span>
+				<span id="spanlogout">
+					<a href="{{ url_for('logout') }}" id="logoutId" class="btn-logout">Sign out</a>
+				</span>
+				<div class="clearfix"></div>
+			</div>
+		</header>
+		{% block content %}
+		{% endblock %}
+	</body>
+	</html>
