@@ -75,6 +75,9 @@ $('.lightSlider').lightSlider({
 							<div class="hotel-rating-box"> 
 								<span class="rating_text"> {{ hotel['rating_count'] }}</span> total ratings
 							</div>
+							<div>
+								Room price: <span class="room_price">Rs. {{ hotel['price'] }}</span> / night
+							</div>
 
 						</div>
 						<div style="margin-top:10px; ">
@@ -94,7 +97,7 @@ $('.lightSlider').lightSlider({
 					</div>
 					<div class="clearfix"></div>
 					<div class="recmdKNN">
-					<h4>{{ recommendationsKNN|length }} &nbsp recommendations using KNN (over 16 attributes):</h4>
+					<h4>{{ recommendationsKNN|length }} &nbsp recommendations using KNN (over 17 attributes):</h4>
 					<ul>
 					{% for rec in recommendationsKNN%}
 					
@@ -133,8 +136,11 @@ $('.lightSlider').lightSlider({
 								<span>{{ rec['tad_review_count'] }} 
 								reviews</span>
 								{% endif %}
+								<br />
+								<span style="margin-left:20px;margin-top: 10px;" class="room_price">Rs. {{ rec['price'] }}</span> / night
 									
 								</div>
+
 							</div>
 						</li>	
 					{% endfor %}

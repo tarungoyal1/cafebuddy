@@ -195,10 +195,10 @@ class PopularHotels:
                     break
 
         # print(hotels_sorted)
-        cols = ['hid', 'property_id', 'property_name', 'city', 'province', 'area', 'state', 'address', 'image_urls', 'room_count', 'room_type','tad_review_rating', 'tad_review_count', 'rating_count']
+        cols = ['hid', 'property_id', 'property_name', 'city', 'province', 'area', 'state', 'address', 'image_urls', 'room_count', 'room_type','tad_review_rating', 'tad_review_count', 'rating_count','price']
         for hotel in hotels_sorted:
             # take attributes that you need
-            h = {cols[i]:hotel[i] for i in range(14)}
+            h = {cols[i]:hotel[i] for i in range(15)}
             h['string_rating_count'] = str(hotel[13])
             final_hotels_sorted.append(h)
 
