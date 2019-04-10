@@ -269,6 +269,43 @@ class Automate:
             sql = "UPDATE `main_info` SET `tad_review_rating` ="+str(avgr[1])+" WHERE `property_id` = "+avgr[0]
             print(Automate.fireQuery(sql))
 
+    def updatePrices(self):
+        sql = "SELECT `property_id`, `rating_count` FROM `main_info`"
+        data = Automate.fireQuery(sql, fetch=True)
+        p = []
+        for hotel in data:
+            rc = hotel[1]
+            price = 500
+            if int(rc) > 100 and int(rc)<400:
+                price = random.randint(1500, 3000)
+                # print(rc, price)
+            elif int(rc) > 400 and int(rc)<1000:
+                price = random.randint(3000, 5000)
+                # print(rc, price)
+            elif int(rc) > 1000 and int(rc)<1500:
+                price = random.randint(5000, 7000)
+                # print(rc, price)
+            elif int(rc) > 1500:
+                price = random.randint(8000, 10000)
+                # print(rc, price)
+            else:
+                price = random.randint(500, 1000)
+                # print(rc, price)
+            sql = "UPDATE `hotel_ratings_count` SET `price` ="+str(price)+" WHERE `property_id` = "+hotel[0]
+            if Automate.fireQuery(sql)==1:
+                print("hotel_id = "+hotel[0])
+
+            # h = tuple([rc, price])
+            # p.append(h)
+        # print(p)
+
+
+
+        # for avgr in avg_ratings:
+        #     # print(avgr[0], avgr[1])
+        #     sql = "UPDATE `main_info` SET `tad_review_rating` ="+str(avgr[1])+" WHERE `property_id` = "+avgr[0]
+        #     print(Automate.fireQuery(sql))
+
 
 
     

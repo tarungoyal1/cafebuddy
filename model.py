@@ -94,6 +94,13 @@ class Hotel:
         return hoteldata
 
     @classmethod
+    def getRoomPrice(cls, hid):
+        sql = "SELECT `price` FROM `hotel_ratings_count` WHERE `property_id`="+str(hid)
+        hoteldata = Hotel.fireQuery(sql, True)
+        return hoteldata
+
+
+    @classmethod
     def getAvailableFacilities(cls, hid):
         sql = "SELECT * FROM `room_facilities` WHERE `property_id`="+str(hid)
         hoteldata = Hotel.fireQuery(sql, True)[0]
@@ -203,19 +210,21 @@ class RecommendHotels(Hotel):
     def parseFacilities(cls, curhid):
         # fac is a list containing dict as only one element
         fac = Hotel.getRoomFacilities(curhid)
+        price = Hotel.getRoomPrice(curhid)
         ratingcount = Hotel.getHotelRatingCount(curhid)
         # print("-----"+str(ratingcount)+"---")
         binfac = []
         for v in fac[0].values():
             binfac.append(int(v))
         binfac.append(int(ratingcount[0]['rating_count']))
+        binfac.append(int(price[0]['price']))
         return binfac[2:]
 
 
 
     def recommendUsingKNN(self, curhid, city, count=8):
         hotels = pd.read_csv("main_info_full.csv")
-        ratings = pd.read_csv("hotel_ratings_count.csv")
+        ratings = pd.read_csv("hotel_ratings_count_full.csv")
         room_fac_df = pd.read_csv("hotel_room_facilities.csv")
 
 
@@ -224,12 +233,14 @@ class RecommendHotels(Hotel):
 
         partial_combined = pd.merge(myhotels, room_fac_df, on='property_id')
         fully_combined = pd.merge(partial_combined, myratings, on='property_id')
-        final = fully_combined.iloc[:, [1,3]+[x for x in range(12, 27) if x!=25]]
-    
+        final = fully_combined.iloc[:, [1,3]+[x for x in range(12, 29) if x!=25 and x!=27]]
+        # print(final)
         current_fac = RecommendHotels.parseFacilities(curhid)
-        
-        X = final.iloc[:, [c for c in range(2, 16)]].values
         # print(current_fac)
+        
+        X = final.iloc[:, [c for c in range(2, 17)]].values
+        # print(X)
+        # return
         
         # Build the nearest neighbors model by using NearestNeighbors object and passing n_neighbors=1
         neighbors = NearestNeighbors(n_neighbors=count).fit(X)
