@@ -7,6 +7,8 @@ import sklearn
 from datetime import datetime
 import logging
 import traceback
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 from sklearn.neighbors import NearestNeighbors
 
 db = SQLAlchemy()
@@ -87,6 +89,23 @@ class Hotel:
         hoteldata = Hotel.fireQuery(sql, True)
         return hoteldata
 
+    @classmethod    
+    def getHotelReviews(self, hid):
+        sql = "SELECT `property_reviews`, `class` FROM `hotel_reviews` WHERE `property_id`="+str(hid)+" ORDER BY id DESC"
+        hotelreviews = Hotel.fireQuery(sql, True)
+        # pos_neg_combined is a list which contains 2 lists one for pos reviews and 2nd for neg
+        pos_neg_combined = []
+        pos = []
+        neg = []
+        for review in hotelreviews:
+            if review['class']=='1':
+                pos.append(review)
+            else:
+                neg.append(review)
+        pos_neg_combined.append(pos)
+        pos_neg_combined.append(neg)
+        return pos_neg_combined
+
     @classmethod
     def getRoomFacilities(cls, hid):
         sql = "SELECT * FROM `room_facilities` WHERE `property_id`="+str(hid)
@@ -120,7 +139,39 @@ class Hotel:
         result = Hotel.fireQuery(sql, True)
         return result
 
+    def insertReviewClassified(self, hid, review, classifier):
+        # Insert a new record of review after doing semantic analysis
+        outcome =  Hotel.sentiment_analysis(review, classifier)
+        reviewclass = ""
+        if outcome=='pos':
+            reviewclass='1'
+        elif outcome=='neg':
+            reviewclass='0'
+        # print(reviewclass)
+        # t = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        sql = sql = "INSERT INTO `hotel_reviews` (`property_id`, `property_reviews`, `class`) VALUES ("+str(hid)+", '"+review+"', '"+reviewclass+"')"
+        result = Hotel.fireQuery(sql, False)
+        return result, reviewclass
 
+    @staticmethod
+    def sentiment_analysis(text, classifier):
+        feats = Hotel.find_features(text)
+        return classifier.classify(feats)
+    
+    @staticmethod
+    def word_feats(words):
+        stpwords = set(stopwords.words("english"))
+        return dict([(word, True) for word in words if word not in stpwords])
+
+    @staticmethod
+    def find_features(document):
+        words = word_tokenize(document)
+        stpwords = set(stopwords.words("english"))
+        words = [word for word in words if word not in stpwords]
+        features = {}
+        for w in Hotel.word_feats(words):
+            features[w] = (w in words)
+        return features
 
 
 class PopularHotels:

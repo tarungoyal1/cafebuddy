@@ -96,6 +96,40 @@ $('.lightSlider').lightSlider({
 						</p>
 					</div>
 					<div class="clearfix"></div>
+					<div class="hotel_reviews_box">
+						<h4>Hotel reviews:</h4>
+						<div class="review_form_div">
+							<input type="hidden" name="hotel_id" id="hotel_id", value="{{ hotel['property_id'] }}"></input>
+							<textarea id="text" name="review_text" required="" autocomplete="off" value="" placeholder="Post your valuable review"></textarea>
+							<button class="btn-primary"  id="review_submit_button">
+									Submit
+							</button>
+							<span id="ajaxloader"><img src="{{ url_for('static', filename='img/ajax-loader.gif') }}" width="32" height="32" /></span>
+						</div>
+						<div id="reviews_list_div">
+							<div class="hotel_reviews_left">
+								Positive reviews:
+								<ul>
+								{% for review in reviews[0][:5] %}
+									{% if review['class']=='1' %}
+										<li>{{ review['property_reviews'][:200] }}...</li>
+									{% endif %}
+								{% endfor %}
+								</ul>
+							</div>
+							<div class="hotel_reviews_right">
+								Negative reviews:
+								<ul>
+								{% for review in reviews[1][:5] %}
+									{% if review['class']=='0' %}
+										<li>{{ review['property_reviews'][:200]  }}...</li>
+									{% endif %}
+								{% endfor %}
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="clearfix"></div>
 					<div class="recmdKNN">
 					<h4>{{ recommendationsKNN|length }} &nbsp recommendations using KNN (over 17 attributes):</h4>
 					<ul>

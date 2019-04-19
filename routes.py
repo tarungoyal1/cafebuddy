@@ -1,6 +1,7 @@
 from flask import Flask, render_template, session, request, redirect, url_for
 from model import db, User, Hotel, PopularHotels, RecommendHotels, TrackActivity
 from forms import *
+import pickle
 import logging
 import traceback
 
@@ -11,6 +12,10 @@ app.secret_key = "9d41cbf4380525bd125213f1ded6c8d61770ae17"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:h3llo2u@localhost/hotels'
 db.init_app(app)
+
+classifier_f = open("logregclassifier_stream_hacker.pickle", "rb")
+classifier = pickle.load(classifier_f)
+classifier_f.close()
 
 
 @app.route("/")
@@ -86,7 +91,7 @@ def home():
     ta = TrackActivity()
     activityList = ta.getUserActivity(user.id)
 
-    # activity is a list containing dictionaries of records of user_history table
+    # activityList is a list containing dictionaries of records of user_history table
 
     # now check if the activity list has something and if it has then already show the recommendations based on visited_hotels
     recommendationsList = []
@@ -156,7 +161,25 @@ def fetchmore():
             return render_template("fetchmorehotels.html", hotels=[])
 
 
-
+@app.route("/submitreview", methods=['POST', 'GET'])
+def submitreview():
+    if request.method == "POST":
+        # handle the form submission
+        datastring= str(request.get_data())[2:-1]
+        # print(datastring)
+        hid, sep, review = datastring.partition('&')
+        hid = hid[4:]
+        review = review[7:]
+        print(hid, review)
+        try:
+            hotel = Hotel()
+            hotel.make_connection()
+            result, reviewclass = hotel.insertReviewClassified(hid, review, classifier)
+            updated_reviews = hotel.getHotelReviews(hid)
+            # print(result)
+            return render_template("submitreview.html", reviews=updated_reviews,reviewclass=reviewclass)
+        except Exception as e:
+            return render_template("submitreview.html", reviews=hotel.getHotelReviews(hid), reviewclass=reviewclass)
 
 @app.route("/hotel")
 def hotel():
@@ -167,7 +190,14 @@ def hotel():
     hid = request.args.get('hotelId')
     city = request.args.get('city')
 
+    if request.method == "POST":
+        if form.validate() == False:
+            pass
+        else:
+            return render_template("home.html", hotelId=hid, showlogin=False)
+
     user = User.query.filter_by(email=session['email']).first()
+
 
     if hid is None or len(hid)<=0:
         return redirect(url_for("home"))
@@ -181,13 +211,15 @@ def hotel():
     hoteldata = h.getHotelInfo(hid)
     hoteldesc = h.getHotelDesc(hid)
     hotelfacilities = h.getAvailableFacilities(hid)
+    hotelreviews = h.getHotelReviews(hid) 
+    # print(hotelreviews)
     if hoteldata!=0 and len(hoteldata)>0:
         try:
             rh = RecommendHotels()
             recommendations = rh.recommendUsingKNN(hid, hoteldata[0]['city'])
-            return render_template("hotel.html", hotel=hoteldata[0],hotelfac=hotelfacilities,hotelDesc=hoteldesc,hotelId=hid,showlogin=False, recommendationsKNN=recommendations)
+            return render_template("hotel.html", hotel=hoteldata[0],hotelfac=hotelfacilities,hotelDesc=hoteldesc,hotelId=hid,reviews=hotelreviews,showlogin=False, recommendationsKNN=recommendations)
         except Exception as e:
-            return render_template("hotel.html", hotel=hoteldata[0],hotelfac=hotelfacilities,hotelDesc=hoteldesc,hotelId=hid,showlogin=False, recommendationsKNN=[])
+            return render_template("hotel.html", hotel=hoteldata[0],hotelfac=hotelfacilities,hotelDesc=hoteldesc,hotelId=hid,reviews=hotelreviews,showlogin=False, recommendationsKNN=[])
     return render_template("hotel.html", hotelId=hid, showlogin=False)
     
 if __name__ == "__main__":

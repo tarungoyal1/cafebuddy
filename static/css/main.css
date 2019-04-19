@@ -353,7 +353,7 @@ header {
   margin-bottom: 20px;
 }
 
-.hotel_desc, .recmdKNN{
+.hotel_desc, .recmdKNN, .hotel_reviews_box{
   width: 100%;
   border-bottom: 1px solid #D3D3D3;
   padding: 10px 20px;
@@ -361,12 +361,48 @@ header {
   margin-bottom: 20px;
 }
 
+.hotel_reviews_left, .hotel_reviews_right{
+  width: 400px;
+  padding: 10px 5px;
+  float: left;
+}
+
+.hotel_reviews_left ul, .hotel_reviews_right ul {
+  font-size: 13px;
+  text-decoration: none;
+  list-style: none;
+}
+.hotel_reviews_left ul li, .hotel_reviews_right ul li{
+  margin-bottom: 15px;
+}
+.review_form_div{
+  width: 100%;
+  height:150px;
+}
+
+textarea {
+  width: 600px;
+  height:60px;
+  float:left;
+}
+
+.review_form_div #review_submit_button{
+  float: left;
+  margin-left:20px;
+  height: 63px;
+  color:white;
+
+}
+
+
 .hotel_desc p {
     font-size: 14px;
     line-height: 1.35em;
     margin: .25em 0;
     letter-spacing: normal;
 }
+
+
 
 .hotel_image_slider_div{
   width: 25%;

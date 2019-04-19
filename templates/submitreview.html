@@ -1,0 +1,27 @@
+<div>{% if reviewclass=='1' %}
+	<span id="classified_message_pos" style="font-size: 14px;">Your review was classified as : <span id="classified_message_pos" style="color:green;font-weight: bolder;">Positive review</span></span>
+{% elif reviewclass=='0' %}
+<span id="classified_message_neg" style="font-size: 14px;">Your review was classified as : <span id="classified_message_pos" style="color:red; font-weight: bolder;"> Negative review</span></span>
+{% endif %}
+</div>
+<br />
+<div class="hotel_reviews_left">
+								Positive reviews:
+								<ul>
+								{% for review in reviews[0][:5] %}
+									{% if review['class']=='1' %}
+										<li>{{ review['property_reviews'][:200] }}...</li>
+									{% endif %}
+								{% endfor %}
+								</ul>
+							</div>
+							<div class="hotel_reviews_right">
+								Negative reviews:
+								<ul>
+								{% for review in reviews[1][:5] %}
+									{% if review['class']=='0' %}
+										<li>{{ review['property_reviews'][:200]  }}...</li>
+									{% endif %}
+								{% endfor %}
+								</ul>
+							</div>

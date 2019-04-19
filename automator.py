@@ -1,5 +1,8 @@
 #!/usr/bin/env python3 
 
+import pickle
+import nltk
+from nltk.tokenize import word_tokenize
 import sys
 import re
 import os
@@ -13,7 +16,7 @@ import random
 import requests
 from bs4 import BeautifulSoup  
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+# from selenium.webdriver.common.keys import Key
 
 class Automate:
 
@@ -298,6 +301,49 @@ class Automate:
             # h = tuple([rc, price])
             # p.append(h)
         # print(p)
+
+    def sentiment_all_reviews(self):
+        classifier_f = open("nbclassifier_stream_hacker.pickle", "rb")
+        classifier = pickle.load(classifier_f)
+        classifier_f.close()
+
+        sql = "SELECT * FROM `hotel_reviews`"
+        data = Automate.fireQuery(sql, fetch=True)
+        data = list(data)
+        for hotel in data:
+            try:
+                if hotel[3]=='0':
+                    print(hotel[2])
+            except Exception as e:
+                raise e
+            # try:
+            #     outcome =  Automate.sentiment_analysis(hotel[2], classifier)
+            #     if outcome=='pos':
+            #         c=1
+            #     elif outcome=='neg':
+            #         c=0
+            #     sql = "UPDATE `hotel_reviews` SET `class` = "+str(c)+" WHERE `property_id` = "+str(hotel[1])
+            #     print(Automate.fireQuery(sql))
+            # except Exception as e:
+                # print(str(e))
+            
+                
+    @staticmethod
+    def sentiment_analysis(text, classifier):
+        feats = Automate.find_features(text)
+        return classifier.classify(feats)
+    
+    @staticmethod
+    def word_feats(words):
+        return dict([(word, True) for word in words])
+
+    @staticmethod
+    def find_features(document):
+        words = word_tokenize(document)
+        features = {}
+        for w in Automate.word_feats(words):
+            features[w] = (w in words)
+        return features
 
 
 
