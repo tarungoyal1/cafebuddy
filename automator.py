@@ -201,25 +201,18 @@ class Automate:
         counter=0
         while counter<len(data):
             try:
-                cursor = Automate._connection.cursor()
                 hotel = data[counter]
                 # print(str(hotel['property_id']), hotel['property_name'])
                 # hotel is a dict
                 urls = hotel['image_urls']
                 hid = str(hotel['property_id'])
-                with Automate._connection:
-                    sql = "UPDATE `main_info` SET `image_urls`=%s WHERE `property_id` = %s"
-                    try:
-                        if cursor.execute(sql, (urls, hid))==1:
-                            print("hotel updated=", "hotel_id = "+ hid)
-                            counter+=1
-                    except Exception as e:
-                        logging.error(traceback.format_exc())
-                        counter+=1
-                cursor = Automate._connection.cursor()                
+                sql = "UPDATE `main_info` SET `image_urls`='"+str(urls)+"' WHERE `property_id` ='"+str(hid)+"'"
+                print(Automate.fireQuery(sql))
+                # if Automate.fireQuery(sql)==True:
+                #     print("hotel_id = ", hid, counter)
+                counter+=1
             except Exception as e:
                 counter+=1
-                cursor = Automate._connection.cursor()
                 logging.error(traceback.format_exc())
 
     @classmethod
