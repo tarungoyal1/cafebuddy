@@ -6,11 +6,10 @@ import logging
 import traceback
 
 
-
 app = Flask(__name__)
 app.secret_key = "9d41cbf4380525bd125213f1ded6c8d61770ae17"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:h3llo2u@localhost/hotels'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:h3llo2uh3llo2u@localhost/hotels'
 db.init_app(app)
 
 classifier_f = open("logregclassifier_stream_hacker.pickle", "rb")
@@ -31,7 +30,7 @@ def signup():
     form = SignupForm()
     if request.method == "POST":
         if form.validate() == False:
-            return render_template('signup.html', form=form)
+            return render_template('signup.html', form=form, message="")
         else:
             # handle form submission
             fname = form.first_name.data
@@ -45,8 +44,10 @@ def signup():
                 db.session.commit()
                 session['email'] = newuser.email
                 return redirect(url_for("home"))
+            else:
+            	return render_template("signup.html", form=form, message="User already exists.")
     elif request.method == "GET":
-        return render_template("signup.html", form=form)
+        return render_template("signup.html", form=form, message="")
 
 @app.route("/logout")
 def logout():
